@@ -7,6 +7,7 @@ const createOrder = async function (req, res) {
     let userId = orderDetails.userId
 
     let user = await userModel.findById(userId)
+    
     if (!user) {
         return res.send({ status: false, message: "user doesnt exist" })
     }
@@ -17,8 +18,9 @@ const createOrder = async function (req, res) {
         return res.send({ status: false, message: "product doesnt exist" })
     }
 
-    //Scenario 1 
-    if (!req.appTypeFree && user.balance >= product.price) {
+   
+    if (
+        !req.appTypeFree && user.balance >= product.price) {
         user.balance = user.balance - product.price
         await user.save()
 
@@ -26,11 +28,12 @@ const createOrder = async function (req, res) {
         orderDetails.isFreeAppUser = false
         let orderCreated = await orderModel.create(orderDetails)
         return res.send({ status: true, data: orderCreated })
-    } else if (!req.appTypeFree) {
-        //Scenario 2 
+    } else if (
+        !req.appTypeFree) {
+        
         return res.send({ status: false, message: "User deosnt have sufficient balance" })
     } else {
-        //Scenario 3 
+        
         orderDetails.amount = 0
         orderDetails.isFreeAppUser = true
         let orderCreated = await orderModel.create(orderDetails)
